@@ -2,9 +2,10 @@ package ru.practicum.statsserver.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.practicum.statsserver.model.EndpointHit;
-import ru.practicum.statsserver.repository.StatsRepository;
+import ru.practicum.statsdto.EndpointHit;
 import ru.practicum.statsdto.ViewStats;
+import ru.practicum.statsserver.model.EndpointHitEntity;
+import ru.practicum.statsserver.repository.StatsRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -12,26 +13,22 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class StatsServiceImpl implements StatsService {
-    private final StatsRepository statsRepository;
 
-    @Override
-    public void saveHit(ru.practicum.statsdto.EndpointHit endpointHitDto) {
-        EndpointHit endpointHit = EndpointHit.builder()
-                .app(endpointHitDto.getApp())
-                .uri(endpointHitDto.getUri())
-                .ip(endpointHitDto.getIp())
-                .timestamp(endpointHitDto.getTimestamp())
+    private final StatsRepository repository;
+
+    public void save(EndpointHit dto) {
+        EndpointHitEntity entity = EndpointHitEntity.builder()
+                .app(dto.getApp())
+                .uri(dto.getUri())
+                .ip(dto.getIp())
+                .timestamp(dto.getTimestamp())
                 .build();
-
-        statsRepository.save(endpointHit);
+        repository.save(entity);
     }
 
-    @Override
-    public List<ViewStats> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
-        if (unique != null && unique) {
-            return statsRepository.findUniqueStats(start, end, uris);
-        } else {
-            return statsRepository.findStats(start, end, uris);
-        }
+    public List<ViewStats> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
+        return unique ?
+                repository.getUniqueStats(start, end, uris) :
+                repository.getAllStats(start, end, uris);
     }
 }

@@ -1,4 +1,4 @@
-version: '3.8'
+
 services:
   stats-db:
     image: postgres:13.7
@@ -9,18 +9,32 @@ services:
       - POSTGRES_DB=stats
       - POSTGRES_USER=stats
       - POSTGRES_PASSWORD=stats
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U stats -d stats"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     volumes:
       - stats_db_data:/var/lib/postgresql/data
 
   stats-service:
-    build: ./stats-service/stats-server  # измените путь
+    build:
+      context: ./stats-service/stats-server
+      dockerfile: Dockerfile
     container_name: stats-service
     ports:
       - "9090:9090"
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-db:5432/stats
+      - SPRING_PROFILES_ACTIVE=docker
     depends_on:
-      - stats-db
+      stats-db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9090/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
 volumes:
   stats_db_data:

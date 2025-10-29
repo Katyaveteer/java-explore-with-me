@@ -1,3 +1,5 @@
+version: "3.9"
+
 services:
   stats-server:
     build: stats-service/stats-server
@@ -5,7 +7,8 @@ services:
     ports:
       - "9090:9090"
     depends_on:
-      - stats-db
+      stats-db:
+        condition: service_healthy
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-db:5432/stats
       - SPRING_DATASOURCE_USERNAME=stats
@@ -22,6 +25,11 @@ services:
       - POSTGRES_DB=stats
       - POSTGRES_USER=stats
       - POSTGRES_PASSWORD=stats
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U stats"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 volumes:
   stats-db-data:

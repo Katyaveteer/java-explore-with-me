@@ -13,7 +13,7 @@ services:
       - stats_db_data:/var/lib/postgresql/data
 
   stats-service:
-    build: ./stats-service
+    build: ./stats-service/stats-server  # измените путь
     container_name: stats-service
     ports:
       - "9090:9090"

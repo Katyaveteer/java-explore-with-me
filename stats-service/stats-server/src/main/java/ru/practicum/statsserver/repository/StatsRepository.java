@@ -1,5 +1,6 @@
 package ru.practicum.statsserver.repository;
 
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import ru.practicum.statsdto.ViewStats;
@@ -24,4 +25,5 @@ public interface StatsRepository extends JpaRepository<EndpointHitEntity, Long> 
             "GROUP BY h.app, h.uri")
     List<ViewStats> getAllStats(LocalDateTime start, LocalDateTime end, List<String> uris);
 }
+
 

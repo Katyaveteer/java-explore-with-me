@@ -27,5 +27,6 @@ public class EndpointHitEntity {
 
     private String ip;
 
+    @Column(name = "timestamp")
     private LocalDateTime timestamp;
 }

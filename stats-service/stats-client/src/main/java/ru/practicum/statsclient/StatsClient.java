@@ -1,41 +1,45 @@
 package ru.practicum.statsclient;
 
-
-
-import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import ru.practicum.statsdto.EndpointHit;
 import ru.practicum.statsdto.ViewStats;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import java.net.URI;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 @Component
-@RequiredArgsConstructor
 public class StatsClient {
+    private final RestTemplate rest;
+    private final String statsBaseUrl;
 
-    private final RestTemplate restTemplate = new RestTemplate();
-    private final String baseUrl = "http://localhost:9090";
-
-    public void hit(EndpointHit hit) {
-        restTemplate.postForEntity(baseUrl + "/hit", hit, Void.class);
+    public StatsClient(RestTemplate rest, String statsBaseUrl) {
+        this.rest = rest;
+        this.statsBaseUrl = statsBaseUrl; // example: "http://localhost:9090"
     }
 
-    public List<ViewStats> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
-        StringBuilder url = new StringBuilder(baseUrl + "/stats?start=" + encode(start) + "&end=" + encode(end));
+    public void postHit(EndpointHit hit) {
+        HttpEntity<EndpointHit> request = new HttpEntity<>(hit);
+        rest.postForLocation(statsBaseUrl + "/hit", request);
+    }
+
+    public List<ViewStats> getStats(String start, String end, List<String> uris, boolean unique) {
+        StringBuilder url = new StringBuilder(statsBaseUrl + "/stats?start=" + encode(start) + "&end=" + encode(end) + "&unique=" + unique);
         if (uris != null && !uris.isEmpty()) {
-            for (String uri : uris) url.append("&uris=").append(uri);
+            for (String uri : uris) {
+                url.append("&uris=").append(encode(uri));
+            }
         }
-        url.append("&unique=").append(unique);
-        ResponseEntity<ViewStats[]> response = restTemplate.getForEntity(url.toString(), ViewStats[].class);
-        return Arrays.asList(Objects.requireNonNull(response.getBody()));
+        ResponseEntity<ViewStats[]> resp = rest.getForEntity(URI.create(url.toString()), ViewStats[].class);
+        return Arrays.asList(Objects.requireNonNull(resp.getBody()));
     }
 
-    private String encode(LocalDateTime dt) {
-        return java.net.URLEncoder.encode(dt.toString().replace("T", " "), java.nio.charset.StandardCharsets.UTF_8);
+    private String encode(String s) {
+        return java.net.URLEncoder.encode(s, java.nio.charset.StandardCharsets.UTF_8);
     }
 }
+

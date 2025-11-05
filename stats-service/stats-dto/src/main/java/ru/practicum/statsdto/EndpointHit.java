@@ -7,8 +7,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 @Data
 @Builder
 @NoArgsConstructor
@@ -26,5 +24,5 @@ public class EndpointHit {
     private String ip;
 
     @NotNull
-    private LocalDateTime timestamp;
+    private String timestamp;
 }

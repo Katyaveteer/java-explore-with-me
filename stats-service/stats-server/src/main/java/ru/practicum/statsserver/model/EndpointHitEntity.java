@@ -1,6 +1,6 @@
 package ru.practicum.statsserver.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,5 +27,6 @@ public class EndpointHitEntity {
 
     private String ip;
 
+    @Column(name = "timestamp")
     private LocalDateTime timestamp;
 }

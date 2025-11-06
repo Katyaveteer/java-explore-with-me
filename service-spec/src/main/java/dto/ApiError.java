@@ -2,6 +2,8 @@ package dto;
 
 import lombok.*;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -10,7 +12,11 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ApiError {
+public class ApiError implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     private List<String> errors;
     private String message;
     private String reason;

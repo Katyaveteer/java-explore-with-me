@@ -4,12 +4,19 @@ package dto.event;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.io.Serial;
+import java.io.Serializable;
+
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UpdateEventUserRequest {
+public class UpdateEventUserRequest implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     @Size(min = 20, max = 2000)
     private String annotation;
 

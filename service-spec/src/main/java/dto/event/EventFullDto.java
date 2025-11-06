@@ -4,12 +4,19 @@ import dto.category.CategoryDto;
 import dto.user.UserShortDto;
 import lombok.*;
 
+import java.io.Serial;
+import java.io.Serializable;
+
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class EventFullDto {
+public class EventFullDto implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     private String annotation;
     private CategoryDto category;
     private Long confirmedRequests;

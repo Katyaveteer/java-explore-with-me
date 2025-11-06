@@ -4,6 +4,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.List;
 
 @Getter
@@ -11,7 +13,11 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class NewCompilationDto {
+public class NewCompilationDto implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     private List<Long> events;
     private Boolean pinned = false;
 

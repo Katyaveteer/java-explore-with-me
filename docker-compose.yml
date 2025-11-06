@@ -37,7 +37,8 @@ services:
 
 
   ewm-main-service:
-      build: ewm-main-service
+      build:
+         context: ./ewm-main-service
       container_name: ewm-main-service-container
       ports:
         - "8080:8080"

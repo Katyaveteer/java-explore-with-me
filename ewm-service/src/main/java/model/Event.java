@@ -42,19 +42,26 @@ public class Event {
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
+    @Builder.Default
     @Column(nullable = false)
     private Boolean paid = false;
 
+
+    @Builder.Default
     @Column(nullable = false)
     private Integer participantLimit = 0;
 
+
+    @Builder.Default
     @Column(nullable = false)
     private Boolean requestModeration = true;
 
+    @Builder.Default
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private EventState state = EventState.PENDING;
 
+    @Builder.Default
     private LocalDateTime createdOn = LocalDateTime.now();
     private LocalDateTime publishedOn;
 }

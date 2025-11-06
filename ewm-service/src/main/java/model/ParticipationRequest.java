@@ -26,8 +26,11 @@ public class ParticipationRequest {
     @JoinColumn(name = "requester_id", nullable = false)
     private User requester;
 
+
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     private RequestStatus status = RequestStatus.PENDING;
 
+    @Builder.Default
     private LocalDateTime created = LocalDateTime.now();
 }

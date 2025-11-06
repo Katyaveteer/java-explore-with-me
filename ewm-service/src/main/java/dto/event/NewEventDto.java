@@ -38,8 +38,10 @@ public class NewEventDto implements Serializable {
 
     @NotNull
     private String eventDate;
-
+    @Builder.Default
     private Boolean paid = false;
+    @Builder.Default
     private Integer participantLimit = 0;
+    @Builder.Default
     private Boolean requestModeration = true;
 }

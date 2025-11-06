@@ -20,7 +20,7 @@ services:
     ports:
       - "6541:5432"
     environment:
-      - POSTGRES_DB=stats-db
+      - POSTGRES_DB=stats_db
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
   ewm-db:

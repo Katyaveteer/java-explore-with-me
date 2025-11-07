@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS events (
     created_on           TIMESTAMP     NOT NULL DEFAULT NOW(),
     paid                 BOOLEAN       NOT NULL DEFAULT FALSE,
     participant_limit    INTEGER       NOT NULL DEFAULT 0,
+    confirmed_requests   INTEGER       NOT NULL DEFAULT 0,
     request_moderation   BOOLEAN       NOT NULL DEFAULT TRUE,
     state                VARCHAR(20)   NOT NULL DEFAULT 'PENDING',
 

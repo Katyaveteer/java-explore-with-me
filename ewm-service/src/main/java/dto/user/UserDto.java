@@ -1,21 +1,25 @@
 package dto.user;
 
-import lombok.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.io.Serial;
-import java.io.Serializable;
 
-@Getter
-@Setter
-@Builder
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDto implements Serializable {
-
-    @Serial
-    private static final long serialVersionUID = 1L;
-
+public class UserDto {
     private Long id;
-    private String email;
+
+    @NotBlank
+    @Size(min = 2, max = 250)
     private String name;
+
+    @NotBlank
+    @Email
+    @Size(min = 6, max = 254)
+    private String email;
 }

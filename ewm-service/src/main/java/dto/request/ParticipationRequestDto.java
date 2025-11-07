@@ -1,24 +1,23 @@
 package dto.request;
 
 
-import lombok.*;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import enums.RequestStatus;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.io.Serial;
-import java.io.Serializable;
+import java.time.LocalDateTime;
 
-@Getter
-@Setter
-@Builder
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ParticipationRequestDto implements Serializable {
+public class ParticipationRequestDto {
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime created;
 
-    @Serial
-    private static final long serialVersionUID = 1L;
-
-    private String created;
     private Long event;
     private Long id;
     private Long requester;
-    private String status;
+    private RequestStatus status;
 }

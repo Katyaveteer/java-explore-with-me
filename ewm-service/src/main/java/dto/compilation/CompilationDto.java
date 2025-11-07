@@ -1,22 +1,17 @@
 package dto.compilation;
 
-import dto.event.EventShortDto;
-import lombok.*;
 
-import java.io.Serial;
-import java.io.Serializable;
+import dto.event.EventShortDto;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.util.List;
 
-@Getter
-@Setter
-@Builder
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CompilationDto implements Serializable {
-
-    @Serial
-    private static final long serialVersionUID = 1L;
-
+public class CompilationDto {
     private List<EventShortDto> events;
     private Long id;
     private Boolean pinned;

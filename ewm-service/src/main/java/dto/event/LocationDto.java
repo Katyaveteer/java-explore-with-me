@@ -1,20 +1,14 @@
 package dto.event;
 
-import lombok.*;
 
-import java.io.Serial;
-import java.io.Serializable;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter
-@Setter
-@Builder
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class LocationDto implements Serializable {
-
-    @Serial
-    private static final long serialVersionUID = 1L;
-
+public class LocationDto {
     private Float lat;
     private Float lon;
 }

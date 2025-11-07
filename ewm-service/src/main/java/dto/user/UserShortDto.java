@@ -1,20 +1,14 @@
 package dto.user;
 
-import lombok.*;
 
-import java.io.Serial;
-import java.io.Serializable;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter
-@Setter
-@Builder
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserShortDto implements Serializable {
-
-    @Serial
-    private static final long serialVersionUID = 1L;
-
+public class UserShortDto {
     private Long id;
     private String name;
 }

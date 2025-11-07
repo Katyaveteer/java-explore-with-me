@@ -17,7 +17,7 @@ public class ErrorHandler {
                 .status("BAD_REQUEST")
                 .reason("Incorrectly made request.")
                 .message(e.getMessage())
-                .timestamp(LocalDateTime.now())
+                .timestamp(String.valueOf(LocalDateTime.now()))
                 .build();
     }
 
@@ -28,7 +28,7 @@ public class ErrorHandler {
                 .status("CONFLICT")
                 .reason("For the requested operation the conditions are not met.")
                 .message(e.getMessage())
-                .timestamp(LocalDateTime.now())
+                .timestamp(String.valueOf(LocalDateTime.now()))
                 .build();
     }
 
@@ -39,7 +39,7 @@ public class ErrorHandler {
                 .status("NOT_FOUND")
                 .reason("The required object was not found.")
                 .message(e.getMessage())
-                .timestamp(LocalDateTime.now())
+                .timestamp(String.valueOf(LocalDateTime.now()))
                 .build();
     }
 }

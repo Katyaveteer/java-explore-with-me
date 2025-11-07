@@ -2,57 +2,55 @@ package statsclient;
 
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import ru.practicum.statsdto.EndpointHit;
-import ru.practicum.statsdto.ViewStats;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class StatsClient {
-
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private final RestTemplate restTemplate;
-    private final String statsServerUrl;
 
-    public StatsClient(RestTemplateBuilder builder, org.springframework.core.env.Environment env) {
-        this.restTemplate = builder.build();
-        this.statsServerUrl = env.getProperty("stats-service.url", "http://localhost:9090");
+    @Value("${stats-server.url:http://localhost:9090}")
+    private String statsServerUrl;
+
+    public void hit(String uri, String ip) {
+        String url = statsServerUrl + "/hit";
+
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("app", "ewm-main-service");
+        parameters.put("uri", uri);
+        parameters.put("ip", ip);
+        parameters.put("timestamp", LocalDateTime.now().format(FORMATTER));
+
+        restTemplate.postForEntity(url, parameters, Object.class);
     }
 
-    public void hit(String app, String uri, String ip, LocalDateTime timestamp) {
-        EndpointHit hit = EndpointHit.builder()
-                .app(app)
-                .uri(uri)
-                .ip(ip)
-                .timestamp(String.valueOf(timestamp))
-                .build();
-        restTemplate.postForObject(statsServerUrl + "/hit", hit, Object.class);
-    }
+    public Long getViews(Long eventId) {
+        String url = statsServerUrl + "/stats?start={start}&end={end}&uris={uris}&unique={unique}";
 
-    public List<ViewStats> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
-        if (uris == null || uris.isEmpty()) return List.of();
+        String start = LocalDateTime.now().minusYears(100).format(FORMATTER);
+        String end = LocalDateTime.now().plusYears(100).format(FORMATTER);
+        String uri = "/events/" + eventId;
 
-        String startStr = start.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-        String endStr = end.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("start", start);
+        parameters.put("end", end);
+        parameters.put("uris", uri);
+        parameters.put("unique", false);
 
-        String uriStr = uris.stream()
-                .map(u -> "uris=" + u)
-                .collect(Collectors.joining("&"));
+        ResponseEntity<Object[]> response = restTemplate.getForEntity(url, Object[].class, parameters);
+        if (response.getBody() != null) {
+            response.getBody();
+        }
 
-        String url = String.format(
-                "%s/stats?start=%s&end=%s&unique=%s&%s",
-                statsServerUrl, startStr, endStr, unique, uriStr
-        );
-
-        ResponseEntity<ViewStats[]> response = restTemplate.getForEntity(url, ViewStats[].class);
-        return Arrays.asList(response.getBody());
+        return 0L;
     }
 }

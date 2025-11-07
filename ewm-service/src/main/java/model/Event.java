@@ -2,66 +2,79 @@ package model;
 
 import enums.EventState;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
-
+import java.util.Set;
 
 @Entity
+@Table(name = "events")
 @Getter
 @Setter
-@Table(name = "events")
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class Event {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 120)
-    private String title;
-
-    @Column(nullable = false, length = 2000)
+    @Column(name = "annotation", nullable = false, length = 2000)
     private String annotation;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", nullable = false)
+    private Category category;
+
+    @Column(name = "confirmed_requests")
+    private Integer confirmedRequests;
+
+    @CreationTimestamp
+    @Column(name = "created_on")
+    private LocalDateTime createdOn;
+
+    @Column(name = "description", length = 7000)
     private String description;
+
+    @Column(name = "event_date", nullable = false)
+    private LocalDateTime eventDate;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "initiator_id", nullable = false)
+    private User initiator;
 
     @Embedded
     private Location location;
 
-    @Column(nullable = false)
-    private LocalDateTime eventDate;
+    @Column(name = "paid", nullable = false)
+    private Boolean paid;
 
-    @ManyToOne
-    @JoinColumn(name = "initiator_id", nullable = false)
-    private User initiator;
+    @Column(name = "participant_limit")
+    private Integer participantLimit;
 
-    @ManyToOne
-    @JoinColumn(name = "category_id", nullable = false)
-    private Category category;
-
-    @Builder.Default
-    @Column(nullable = false)
-    private Boolean paid = false;
-
-
-    @Builder.Default
-    @Column(nullable = false)
-    private Integer participantLimit = 0;
-
-
-    @Builder.Default
-    @Column(nullable = false)
-    private Boolean requestModeration = true;
-
-    @Builder.Default
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private EventState state = EventState.PENDING;
-
-    @Builder.Default
-    private LocalDateTime createdOn = LocalDateTime.now();
+    @Column(name = "published_on")
     private LocalDateTime publishedOn;
+
+    @Column(name = "request_moderation")
+    private Boolean requestModeration;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "state")
+    private EventState state;
+
+    @Column(name = "title", nullable = false, length = 120)
+    private String title;
+
+    @Transient
+    private Long views;
+
+    @OneToMany(mappedBy = "event")
+    private Set<ParticipationRequest> requests;
+
+    @ManyToMany(mappedBy = "events")
+    private Set<Compilation> compilations;
 }
+
+
+

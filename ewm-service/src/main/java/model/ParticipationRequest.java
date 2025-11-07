@@ -1,36 +1,38 @@
 package model;
 
+
 import enums.RequestStatus;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "participation_requests")
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
-@Table(name = "requests", uniqueConstraints = @UniqueConstraint(columnNames = {"event_id", "requester_id"}))
 public class ParticipationRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @CreationTimestamp
+    @Column(name = "created")
+    private LocalDateTime created;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_id", nullable = false)
     private Event event;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "requester_id", nullable = false)
     private User requester;
 
-
-    @Builder.Default
     @Enumerated(EnumType.STRING)
-    private RequestStatus status = RequestStatus.PENDING;
-
-    @Builder.Default
-    private LocalDateTime created = LocalDateTime.now();
+    @Column(name = "status")
+    private RequestStatus status;
 }

@@ -1,12 +1,16 @@
 package controller.publicApi;
 
+
 import dto.event.EventFullDto;
 import dto.event.EventShortDto;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import service.publicService.PublicEventService;
-import statsclient.StatsClient;
+import service.EventService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -14,33 +18,28 @@ import java.util.List;
 @RestController
 @RequestMapping("/events")
 @RequiredArgsConstructor
+@Validated
 public class PublicEventController {
-
-    private final PublicEventService eventService;
-    private final StatsClient statsClient;
+    private final EventService eventService;
 
     @GetMapping
     public List<EventShortDto> getEvents(
             @RequestParam(required = false) String text,
             @RequestParam(required = false) List<Long> categories,
             @RequestParam(required = false) Boolean paid,
-            @RequestParam(required = false) LocalDateTime rangeStart,
-            @RequestParam(required = false) LocalDateTime rangeEnd,
-            @RequestParam(defaultValue = "false") Boolean onlyAvailable,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeStart,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeEnd,
+            @RequestParam(required = false) Boolean onlyAvailable,
             @RequestParam(required = false) String sort,
-            @RequestParam(defaultValue = "0") int from,
-            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
+            @RequestParam(defaultValue = "10") @Positive Integer size,
             HttpServletRequest request) {
-
-        statsClient.hit("ewm-main-service", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now());
-
-        return eventService.getEvents(text, categories, paid, rangeStart, rangeEnd,
-                onlyAvailable, sort, from, size);
+        return eventService.getEventsPublic(text, categories, paid, rangeStart, rangeEnd,
+                onlyAvailable, sort, from, size, request);
     }
 
     @GetMapping("/{id}")
     public EventFullDto getEvent(@PathVariable Long id, HttpServletRequest request) {
-        statsClient.hit("ewm-main-service", request.getRequestURI(), request.getRemoteAddr(), LocalDateTime.now());
-        return eventService.getEvent(id);
+        return eventService.getEventPublic(id, request);
     }
 }

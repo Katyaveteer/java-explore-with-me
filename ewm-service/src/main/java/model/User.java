@@ -3,21 +3,29 @@ package model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Set;
+
 @Entity
-@Table(name = "users", schema = "public", uniqueConstraints = @UniqueConstraint(columnNames = "email"))
+@Table(name = "users")
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "name", nullable = false, length = 250)
+    private String name;
+
+    @Column(name = "email", nullable = false, unique = true, length = 254)
     private String email;
 
-    @Column(nullable = false)
-    private String name;
+    @OneToMany(mappedBy = "initiator")
+    private Set<Event> events;
+
+    @OneToMany(mappedBy = "requester")
+    private Set<ParticipationRequest> requests;
 }

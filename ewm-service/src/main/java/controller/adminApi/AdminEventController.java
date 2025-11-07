@@ -1,12 +1,16 @@
 package controller.adminApi;
 
+
 import dto.event.EventFullDto;
 import dto.event.UpdateEventAdminRequest;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import service.adminService.AdminEventService;
+import service.EventService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -14,9 +18,9 @@ import java.util.List;
 @RestController
 @RequestMapping("/admin/events")
 @RequiredArgsConstructor
+@Validated
 public class AdminEventController {
-
-    private final AdminEventService service;
+    private final EventService eventService;
 
     @GetMapping
     public List<EventFullDto> getEvents(
@@ -25,14 +29,14 @@ public class AdminEventController {
             @RequestParam(required = false) List<Long> categories,
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeStart,
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeEnd,
-            @RequestParam(defaultValue = "0") int from,
-            @RequestParam(defaultValue = "10") int size) {
-        return service.getEvents(users, states, categories, rangeStart, rangeEnd, from, size);
+            @RequestParam(defaultValue = "0") @PositiveOrZero Integer from,
+            @RequestParam(defaultValue = "10") @Positive Integer size) {
+        return eventService.getEventsByAdmin(users, states, categories, rangeStart, rangeEnd, from, size);
     }
 
     @PatchMapping("/{eventId}")
     public EventFullDto updateEvent(@PathVariable Long eventId,
-                                    @Valid @RequestBody UpdateEventAdminRequest dto) {
-        return service.updateEvent(eventId, dto);
+                                    @Valid @RequestBody UpdateEventAdminRequest updateRequest) {
+        return eventService.updateEventByAdmin(eventId, updateRequest);
     }
 }

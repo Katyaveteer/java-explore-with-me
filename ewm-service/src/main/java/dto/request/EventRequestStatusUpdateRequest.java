@@ -1,25 +1,17 @@
 package dto.request;
 
 
-import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import enums.RequestStatus;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.io.Serial;
-import java.io.Serializable;
 import java.util.List;
 
-@Getter
-@Setter
-@Builder
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class EventRequestStatusUpdateRequest implements Serializable {
-
-    @Serial
-    private static final long serialVersionUID = 1L;
-
+public class EventRequestStatusUpdateRequest {
     private List<Long> requestIds;
-
-    @NotNull
-    private String status;
+    private RequestStatus status;
 }

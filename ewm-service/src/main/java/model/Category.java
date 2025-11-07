@@ -1,20 +1,25 @@
 package model;
 
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+
+import java.util.Set;
 
 @Entity
+@Table(name = "categories")
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
-@Table(name = "categories", uniqueConstraints = @UniqueConstraint(columnNames = "name"))
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 50)
+    @Column(name = "name", nullable = false, unique = true, length = 50)
     private String name;
+
+    @OneToMany(mappedBy = "category")
+    private Set<Event> events;
 }

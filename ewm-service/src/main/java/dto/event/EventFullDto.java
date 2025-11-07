@@ -1,36 +1,43 @@
 package dto.event;
 
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 import dto.category.CategoryDto;
 import dto.user.UserShortDto;
-import lombok.*;
+import enums.EventState;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.io.Serial;
-import java.io.Serializable;
+import java.time.LocalDateTime;
 
-@Getter
-@Setter
-@Builder
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class EventFullDto implements Serializable {
-
-    @Serial
-    private static final long serialVersionUID = 1L;
-
+public class EventFullDto {
+    private Long id;
     private String annotation;
     private CategoryDto category;
     private Long confirmedRequests;
-    private String createdOn;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime createdOn;
+
     private String description;
-    private String eventDate;
-    private Long id;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime eventDate;
+
     private UserShortDto initiator;
     private LocationDto location;
     private Boolean paid;
     private Integer participantLimit;
-    private String publishedOn;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime publishedOn;
+
     private Boolean requestModeration;
-    private String state; // PENDING, PUBLISHED, CANCELED
+    private EventState state;
     private String title;
     private Long views;
 }

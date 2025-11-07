@@ -1,22 +1,17 @@
 package dto.category;
 
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.io.Serial;
-import java.io.Serializable;
 
-@Getter
-@Setter
-@Builder
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class NewCategoryDto implements Serializable {
-
-    @Serial
-    private static final long serialVersionUID = 1L;
-
+public class NewCategoryDto {
     @NotBlank
     @Size(min = 1, max = 50)
     private String name;

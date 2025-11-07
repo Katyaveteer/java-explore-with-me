@@ -51,7 +51,7 @@ public class StatsClient {
 
         List<Map<String, Object>> data = response.getBody();
         if (data != null && !data.isEmpty()) {
-            Object hits = data.get(0).get("hits");
+            Object hits = data.getFirst().get("hits");
             return Long.valueOf(String.valueOf(hits));
         }
 

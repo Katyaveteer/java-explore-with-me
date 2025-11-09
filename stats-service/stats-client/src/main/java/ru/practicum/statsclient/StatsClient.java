@@ -3,6 +3,7 @@ package ru.practicum.statsclient;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -37,6 +38,7 @@ public class StatsClient {
 
     private final HttpClient httpClient;
 
+    @Autowired
     public StatsClient(@Value("ewm-main-service") String application,
                        @Value("${stats-server.url}") String statsServiceUri,
                        ObjectMapper json) {
@@ -75,9 +77,9 @@ public class StatsClient {
 
             // отправляем сформированный запрос
             HttpResponse<Void> response = httpClient.send(hitRequest, HttpResponse.BodyHandlers.discarding());
-            log.debug("Response from stats-service: {}", response);
+            log.debug("Ответ от статистического сервиса: {}", response);
         } catch (Exception e) {
-            log.warn("Cannot record hit", e);
+            log.warn("Не удается записать  hit", e);
         }
     }
 
@@ -102,9 +104,9 @@ public class StatsClient {
                 });
             }
 
-            log.debug("Response from stats-service: {}", response);
+            log.debug("Ответ от статистического сервиса: {}", response);
         } catch (Exception e) {
-            log.warn("Cannot get view stats from request: " + request, e);
+            log.warn("Не удается получить статистику просмотра по запросу: " + request, e);
         }
         return Collections.emptyList();
     }
@@ -130,4 +132,3 @@ public class StatsClient {
         return URLEncoder.encode(value, StandardCharsets.UTF_8);
     }
 }
-

@@ -40,7 +40,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto addUser(NewUserRequest userDto) {
         if (userRepository.existsByName(userDto.getName())) {
-            throw new AlreadyExistsException("User already exists with name: " + userDto.getName());
+            throw new AlreadyExistsException("Пользователь уже существует с именем: " + userDto.getName());
         }
         User userToSave = userMapper.toUser(userDto);
         userRepository.save(userToSave);
@@ -51,7 +51,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUser(Long userId) {
         userRepository.findById(userId).orElseThrow(() ->
-                new NotFoundException("User does not exist with id" + userId));
+                new NotFoundException("Пользователь не существует с идентификатором" + userId));
         userRepository.deleteById(userId);
     }
 }

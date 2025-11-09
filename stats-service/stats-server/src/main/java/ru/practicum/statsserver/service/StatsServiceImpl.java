@@ -37,7 +37,7 @@ public class StatsServiceImpl implements StatsService {
         LocalDateTime e = LocalDateTime.parse(end, formatter);
 
         if (s.isAfter(e)) {
-            throw new ValidationException("Start date must be before end date");
+            throw new ValidationException("Дата начала должна быть раньше даты окончания");
         }
 
         // Если uris пустой или null — не фильтруем по URI

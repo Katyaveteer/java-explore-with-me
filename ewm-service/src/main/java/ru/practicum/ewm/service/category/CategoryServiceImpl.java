@@ -28,7 +28,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryDto addCategory(NewCategoryDto newCategoryDto) {
         if (categoryRepository.existsByName(newCategoryDto.getName())) {
-            throw new AlreadyExistsException("Category already exists: " + newCategoryDto.getName());
+            throw new AlreadyExistsException("Категория уже существует:" + newCategoryDto.getName());
         }
         Category categoryToSave = categoryMapper.toCategory(newCategoryDto);
         categoryRepository.save(categoryToSave);
@@ -39,7 +39,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public void deleteCategory(Long categoryId) {
         if (eventRepository.existsByCategoryId(categoryId)) {
-            throw new AlreadyExistsException("Category is not empty");
+            throw new AlreadyExistsException("Категория не является пустой");
         }
         categoryRepository.deleteById(categoryId);
     }
@@ -48,12 +48,12 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryDto updateCategory(Long categoryId, NewCategoryDto categoryDto) {
         if (categoryDto.getName() == null || categoryDto.getName().isEmpty()) {
-            throw new RuntimeException("Category name could not be empty");
+            throw new RuntimeException("Название категории не может быть пустым");
         }
         Category savedCategory = categoryRepository.findById(categoryId).orElseThrow(() ->
-                new NotFoundException("Category was not found with id " + categoryId));
+                new NotFoundException("Категория с идентификатором не найдена " + categoryId));
         if (!savedCategory.getName().equals(categoryDto.getName()) && categoryRepository.existsByName(categoryDto.getName())) {
-            throw new AlreadyExistsException("Category already exists: " + categoryDto.getName());
+            throw new AlreadyExistsException("Категория уже существует: " + categoryDto.getName());
         } else {
             savedCategory.setName(categoryDto.getName());
             return categoryMapper.toCategoryDto(categoryRepository.save(savedCategory));
@@ -71,7 +71,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryDto getCategory(Long categoryId) {
         Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new NotFoundException("Category was not found with id " + categoryId));
+                .orElseThrow(() -> new NotFoundException("Категория с идентификатором не найдена" + categoryId));
         return categoryMapper.toCategoryDto(category);
     }
 }

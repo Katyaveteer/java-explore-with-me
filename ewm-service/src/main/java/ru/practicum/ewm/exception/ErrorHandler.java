@@ -17,7 +17,7 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiError badRequest(final ValidationException e) {
-        return new ApiError(e.getMessage(), "Incorrectly made request.",
+        return new ApiError(e.getMessage(), "Неправильно сделанный запрос",
                 HttpStatus.BAD_REQUEST.getReasonPhrase().toUpperCase(), LocalDateTime.now().format(DTF));
     }
 
@@ -25,7 +25,7 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(value = HttpStatus.NOT_FOUND)
     public ApiError notFound(final NotFoundException e) {
-        return new ApiError(e.getMessage(), "The required object was not found.",
+        return new ApiError(e.getMessage(), "Искомый объект не был найден",
                 HttpStatus.NOT_FOUND.getReasonPhrase().toUpperCase(), LocalDateTime.now().format(DTF));
     }
 
@@ -33,7 +33,7 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(value = HttpStatus.CONFLICT)
     public ApiError alreadyExists(AlreadyExistsException e) {
-        return new ApiError(e.getMessage(), "For the requested operation the conditions are not met.",
+        return new ApiError(e.getMessage(), "Для запрошенной операции условия не выполнены",
                 HttpStatus.CONFLICT.getReasonPhrase().toUpperCase(), LocalDateTime.now().format(DTF));
     }
 }

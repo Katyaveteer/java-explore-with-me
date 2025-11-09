@@ -67,7 +67,7 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     public CompilationDto getCompilation(Long compilationId) {
         Compilation compilation = compilationRepository.findById(compilationId)
-                .orElseThrow(() -> new NotFoundException("Compilation does not exist with id" + compilationId));
+                .orElseThrow(() -> new NotFoundException("Подборки не существует с Id: " + compilationId));
 
         // переводим в ДТО и сохраняем ConfirmedRequestsAndViews
         CompilationDto compilationDto = compilationMapper.toCompilationDto(compilation);
@@ -110,7 +110,7 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     public void deleteCompilation(Long compilationId) {
         compilationRepository.findById(compilationId).orElseThrow(() ->
-                new NotFoundException("Compilation does not exist with id" + compilationId));
+                new NotFoundException("Подборки не существует с Id: " + compilationId));
         compilationRepository.deleteById(compilationId);
     }
 
@@ -119,7 +119,7 @@ public class CompilationServiceImpl implements CompilationService {
     public CompilationDto updateCompilation(Long compilationId, UpdateCompilationRequest updateCompilationRequest) {
         // выгружаем подборку из БД
         Compilation compilation = compilationRepository.findById(compilationId).orElseThrow(() ->
-                new NotFoundException("Compilation does not exist with id" + compilationId));
+                new NotFoundException("Подборки не существует с Id: " + compilationId));
 
         // если в присланной подборке есть события, то сохраняем их в выгруженной подборке
         if (updateCompilationRequest.getEvents() != null && !updateCompilationRequest.getEvents().isEmpty()) {

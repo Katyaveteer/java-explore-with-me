@@ -24,7 +24,7 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
   ewm-service:
-    build: main-service
+    build: ewm-service
     image: ewm-service
     container_name: ewm-service
     ports:

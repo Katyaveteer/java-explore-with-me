@@ -56,13 +56,14 @@ public class StatsClient {
                 .timestamp(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
                 .build();
 
-        log.info("StatsClient / hit: {}", hit);
+        log.info("StatsClient / hit: {}", hit.toString());
 
         try {
             HttpRequest.BodyPublisher bodyPublisher = HttpRequest
                     .BodyPublishers
                     .ofString(json.writeValueAsString(hit));
 
+            // формируем запрос
             HttpRequest hitRequest = HttpRequest.newBuilder()
                     .uri(URI.create(statsServiceUri + "/hit"))
                     .POST(bodyPublisher)
@@ -70,19 +71,15 @@ public class StatsClient {
                     .header(HttpHeaders.ACCEPT, "application/json")
                     .build();
 
-            // Синхронная отправка, ждём завершения
-            HttpResponse<Void> response = httpClient.send(hitRequest, HttpResponse.BodyHandlers.discarding());
+            log.info("StatsClient / hitRequest: {}", hitRequest.toString());
 
-            if (!HttpStatus.valueOf(response.statusCode()).is2xxSuccessful()) {
-                log.warn("Hit not recorded: {}", response.statusCode());
-            } else {
-                log.debug("Hit recorded successfully: {}", response);
-            }
+            // отправляем сформированный запрос
+            HttpResponse<Void> response = httpClient.send(hitRequest, HttpResponse.BodyHandlers.discarding());
+            log.debug("Response from stats-service: {}", response);
         } catch (Exception e) {
             log.warn("Cannot record hit", e);
         }
     }
-
 
     public List<ViewStats> getStats(ViewStatsRequest request) {
         try {
@@ -133,3 +130,4 @@ public class StatsClient {
         return URLEncoder.encode(value, StandardCharsets.UTF_8);
     }
 }
+

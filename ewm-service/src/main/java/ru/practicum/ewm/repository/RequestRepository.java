@@ -2,10 +2,12 @@ package ru.practicum.ewm.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import ru.practicum.ewm.enums.RequestStatus;
 import ru.practicum.ewm.model.Request;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface RequestRepository extends JpaRepository<Request, Long> {
@@ -25,4 +27,10 @@ public interface RequestRepository extends JpaRepository<Request, Long> {
     List<Request> findAllByRequesterIdAndNotInitiator(Long userId);
 
     List<Request> findAllByEvent_InitiatorIdAndEvent_Id(Long userId, Long eventId);
+
+    @Query("SELECT r.event.id AS eventId, COUNT(r) AS cnt " +
+            "FROM Request r " +
+            "WHERE r.event.id IN :eventIds AND r.status = 'CONFIRMED' " +
+            "GROUP BY r.event.id")
+    Map<Long, Long> countConfirmedByEventIds(@Param("eventIds") List<Long> eventIds);
 }

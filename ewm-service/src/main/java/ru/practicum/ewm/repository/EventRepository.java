@@ -9,7 +9,6 @@ import org.springframework.stereotype.Repository;
 import ru.practicum.ewm.enums.EventState;
 import ru.practicum.ewm.model.Event;
 
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;

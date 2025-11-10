@@ -16,7 +16,6 @@ import ru.practicum.ewm.dto.request.EventRequestStatusUpdateRequest;
 import ru.practicum.ewm.dto.request.EventRequestStatusUpdateResult;
 import ru.practicum.ewm.dto.request.ParticipationRequestDto;
 import ru.practicum.ewm.service.event.EventService;
-import ru.practicum.ewm.service.request.RequestService;
 
 import java.util.List;
 
@@ -26,7 +25,7 @@ import java.util.List;
 @Slf4j
 public class PrivateEventController {
     private final EventService eventService;
-    private final RequestService requestService;
+
 
     // получение событий текущего пользователя
     @GetMapping
@@ -73,7 +72,7 @@ public class PrivateEventController {
         log.info("PrivateEventController / getRequestsByCurrentUserOfCurrentEvent: " +
                 "Получение инфо о запросах на участие в событии текущего пользователя " +
                 userId + eventId);
-        return requestService.getRequestsByCurrentUserOfCurrentEvent(userId, eventId);
+        return eventService.getRequestsByCurrentUserOfCurrentEvent(userId, eventId);
     }
 
     // Изменение статуса (подтверждена, отменена) заявок на участие в событии текущего пользователя
@@ -84,6 +83,6 @@ public class PrivateEventController {
         log.info("PrivateEventController / updateRequest: " +
                 "Изменение статуса (подтверждена, отменена) заявок на участие в событии текущего пользователя " +
                 userId + eventId + eventRequestStatusUpdateRequest);
-        return requestService.updateRequest(userId, eventId, eventRequestStatusUpdateRequest);
+        return eventService.updateRequest(userId, eventId, eventRequestStatusUpdateRequest);
     }
 }

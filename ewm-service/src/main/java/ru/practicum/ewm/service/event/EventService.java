@@ -2,6 +2,9 @@ package ru.practicum.ewm.service.event;
 
 import org.springframework.data.domain.Pageable;
 import ru.practicum.ewm.dto.event.*;
+import ru.practicum.ewm.dto.request.EventRequestStatusUpdateRequest;
+import ru.practicum.ewm.dto.request.EventRequestStatusUpdateResult;
+import ru.practicum.ewm.dto.request.ParticipationRequestDto;
 
 import java.util.List;
 
@@ -23,13 +26,7 @@ public interface EventService {
 
     // admin
     // поиск событий
-    List<EventFullDto> getEventsByAdmin(List<Long> userIdList,
-                                        List<String> states,
-                                        List<Long> categories,
-                                        String rangeStart,
-                                        String rangeEnd,
-                                        Integer from,
-                                        Integer size);
+    List<EventFullDto> getEventsByAdmin(AdminEventFilter filter);
 
     // редактирование данных события и его статуса
     EventFullDto updateEventByAdmin(Long eventId,
@@ -37,19 +34,18 @@ public interface EventService {
 
     // public
     // получение событий с возможностью фильтрации
-    List<EventShortDto> getEventList(String text,
-                                     List<Long> categoryIdList,
-                                     Boolean paid,
-                                     String rangeStart,
-                                     String rangeEnd,
-                                     Boolean onlyAvailable,
-                                     String sort,
-                                     Integer from,
-                                     Integer size,
-                                     String userIp,
-                                     String requestUri);
+    List<EventShortDto> getEventList(PublicEventFilter filter);
 
     // получение подробной инфо о событии по его id
     EventFullDto getEvent(Long eventId, String userIp, String requestUri);
+
+    // private: events
+    // Получение инфо о запросах на участие в событии текущего пользователя
+    List<ParticipationRequestDto> getRequestsByCurrentUserOfCurrentEvent(Long userId, Long eventId);
+
+    // Изменение статуса (подтверждена, отменена) заявок на участие в событии текущего пользователя
+    EventRequestStatusUpdateResult updateRequest(Long userId,
+                                                 Long eventId,
+                                                 EventRequestStatusUpdateRequest eventRequestStatusUpdateRequest);
 
 }

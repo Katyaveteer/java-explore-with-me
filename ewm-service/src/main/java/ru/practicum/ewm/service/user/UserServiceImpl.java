@@ -1,9 +1,9 @@
 package ru.practicum.ewm.service.user;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewm.dto.user.NewUserRequest;
-import org.springframework.data.domain.Pageable;
 import ru.practicum.ewm.dto.user.UserDto;
 import ru.practicum.ewm.exception.AlreadyExistsException;
 import ru.practicum.ewm.exception.NotFoundException;

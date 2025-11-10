@@ -2,6 +2,7 @@ package ru.practicum.ewm.service.category;
 
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewm.dto.category.CategoryDto;
 import ru.practicum.ewm.dto.category.NewCategoryDto;
@@ -11,8 +12,6 @@ import ru.practicum.ewm.mapper.CategoryMapper;
 import ru.practicum.ewm.model.Category;
 import ru.practicum.ewm.repository.CategoryRepository;
 import ru.practicum.ewm.repository.EventRepository;
-import org.springframework.data.domain.Pageable;
-
 
 import java.util.List;
 
@@ -27,9 +26,6 @@ public class CategoryServiceImpl implements CategoryService {
     // добавление новой категории
     @Override
     public CategoryDto addCategory(NewCategoryDto newCategoryDto) {
-        if (categoryRepository.existsByName(newCategoryDto.getName())) {
-            throw new AlreadyExistsException("Категория уже существует:" + newCategoryDto.getName());
-        }
         Category categoryToSave = categoryMapper.toCategory(newCategoryDto);
         categoryRepository.save(categoryToSave);
         return categoryMapper.toCategoryDto(categoryToSave);

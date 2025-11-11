@@ -13,8 +13,8 @@ public class PublicEventFilter {
     private String rangeEnd;
     private Boolean onlyAvailable;
     private String sort;
-    private Integer from;
-    private Integer size;
+    private Integer from = 0;
+    private Integer size = 10;
     private String userIp;
     private String requestUri;
 }

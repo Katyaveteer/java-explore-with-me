@@ -250,23 +250,27 @@ public class EventServiceImpl implements EventService {
         LocalDateTime start;
         LocalDateTime end;
 
-        if (filter.getRangeStart() != null && filter.getRangeEnd() != null) {
+        String startStr = filter.getRangeStart();
+        String endStr = filter.getRangeEnd();
 
-            start = LocalDateTime.parse(filter.getRangeStart(), DTF);
-            end = LocalDateTime.parse(filter.getRangeEnd(), DTF);
+        boolean hasStart = startStr != null && !startStr.trim().isEmpty();
+        boolean hasEnd = endStr != null && !endStr.trim().isEmpty();
+
+        if (hasStart && hasEnd) {
+            start = LocalDateTime.parse(startStr, DTF);
+            end = LocalDateTime.parse(endStr, DTF);
 
             if (start.isAfter(end)) {
                 throw new ValidationException("Неправильные даты");
             }
 
         } else {
-
-            start = filter.getRangeStart() != null
-                    ? LocalDateTime.parse(filter.getRangeStart(), DTF)
+            start = hasStart
+                    ? LocalDateTime.parse(startStr, DTF)
                     : LocalDateTime.now();
 
-            end = filter.getRangeEnd() != null
-                    ? LocalDateTime.parse(filter.getRangeEnd(), DTF)
+            end = hasEnd
+                    ? LocalDateTime.parse(endStr, DTF)
                     : LocalDateTime.now().plusYears(10);
         }
 

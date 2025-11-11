@@ -41,7 +41,11 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     public List<CompilationDto> getCompilationList(Boolean pinned, Integer from, Integer size) {
 
-        Pageable pageable = PageRequest.of(from / size, size);
+        int safeFrom = (from != null) ? from : 0;
+        int safeSize = (size != null) ? size : 10;
+
+        Pageable pageable = PageRequest.of(safeFrom / safeSize, safeSize);
+
         Page<Compilation> compilationPage;
 
         if (pinned != null) {

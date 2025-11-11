@@ -27,6 +27,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -160,7 +161,11 @@ public class EventServiceImpl implements EventService {
     @Override
     public List<EventFullDto> getEventsByAdmin(AdminEventFilter filter) {
 
-        List<Event> events = handleFilters(filter);
+        // дефолты
+        int from = filter.getFrom() != null ? filter.getFrom() : 0;
+        int size = filter.getSize() != null ? filter.getSize() : 10;
+
+        List<Event> events = handleFilters(filter, from, size);
 
         return events.stream()
                 .map(eventMapper::toEventFullDto)
@@ -168,7 +173,7 @@ public class EventServiceImpl implements EventService {
                 .toList();
     }
 
-    private List<Event> handleFilters(AdminEventFilter filter) {
+    private List<Event> handleFilters(AdminEventFilter filter, int from, int size) {
 
         boolean noFilters =
                 filter.getStates() == null &&
@@ -177,10 +182,7 @@ public class EventServiceImpl implements EventService {
                         filter.getUsers() == null &&
                         filter.getCategories() == null;
 
-        PageRequest pageRequest = PageRequest.of(
-                filter.getFrom() / filter.getSize(),
-                filter.getSize()
-        );
+        PageRequest pageRequest = PageRequest.of(from / size, size);
 
         if (noFilters) {
             return eventRepository.findAll(pageRequest).toList();
@@ -203,6 +205,7 @@ public class EventServiceImpl implements EventService {
                 pageRequest
         ).toList();
     }
+
 
 
     // редактирование данных события и его статуса

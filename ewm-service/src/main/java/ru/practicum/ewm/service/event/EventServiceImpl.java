@@ -161,11 +161,8 @@ public class EventServiceImpl implements EventService {
     @Override
     public List<EventFullDto> getEventsByAdmin(AdminEventFilter filter) {
 
-        // дефолты
-        int from = filter.getFrom() != null ? filter.getFrom() : 0;
-        int size = filter.getSize() != null ? filter.getSize() : 10;
 
-        List<Event> events = handleFilters(filter, from, size);
+        List<Event> events = handleFilters(filter, filter.getFrom(), filter.getSize());
 
         return events.stream()
                 .map(eventMapper::toEventFullDto)
@@ -188,23 +185,41 @@ public class EventServiceImpl implements EventService {
             return eventRepository.findAll(pageRequest).toList();
         }
 
-        LocalDateTime start = (filter.getRangeStart() != null && !filter.getRangeStart().isEmpty())
-                ? LocalDateTime.parse(filter.getRangeStart(), DTF)
-                : LocalDateTime.MIN;
+        LocalDateTime start;
+        try {
+            start = (filter.getRangeStart() != null && !filter.getRangeStart().isEmpty())
+                    ? LocalDateTime.parse(filter.getRangeStart(), DTF)
+                    : LocalDateTime.now().minusYears(10);
+        } catch (Exception e) {
+            start = LocalDateTime.now().minusYears(10);
 
-        LocalDateTime end = (filter.getRangeEnd() != null && !filter.getRangeEnd().isEmpty())
-                ? LocalDateTime.parse(filter.getRangeEnd(), DTF)
-                : LocalDateTime.MAX;
+        }
+
+        LocalDateTime end;
+        try {
+            end = (filter.getRangeEnd() != null && !filter.getRangeEnd().isEmpty())
+                    ? LocalDateTime.parse(filter.getRangeEnd(), DTF)
+                    : LocalDateTime.now().plusYears(10);
+        } catch (Exception e) {
+            end = LocalDateTime.now().plusYears(10);
+
+        }
+
+
+        List<Long> users = filter.getUsers() != null ? filter.getUsers() : Collections.emptyList();
+        List<String> states = filter.getStates() != null ? filter.getStates() : Collections.emptyList();
+        List<Long> categories = filter.getCategories() != null ? filter.getCategories() : Collections.emptyList();
 
         return eventRepository.findEvents(
-                filter.getUsers(),
-                filter.getStates(),
-                filter.getCategories(),
+                users,
+                states,
+                categories,
                 start,
                 end,
                 pageRequest
         ).toList();
     }
+
 
 
 

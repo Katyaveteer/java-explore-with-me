@@ -42,46 +42,49 @@ public class CompilationServiceImpl implements CompilationService {
     public List<CompilationDto> getCompilationList(Boolean pinned, Integer from, Integer size) {
 
         int safeFrom = (from != null) ? from : 0;
-        int safeSize = (size != null) ? size : 10;
+        int safeSize = (size != null && size > 0) ? size : 10;
 
         Pageable pageable = PageRequest.of(safeFrom / safeSize, safeSize);
 
-        Page<Compilation> compilationPage;
-
-        if (pinned != null) {
-            compilationPage = compilationRepository.findAllByPinnedOrderByIdDesc(pinned, pageable);
-        } else {
-            compilationPage = compilationRepository.findAll(pageable);
-        }
+        Page<Compilation> compilationPage =
+                (pinned != null)
+                        ? compilationRepository.findAllByPinnedOrderByIdDesc(pinned, pageable)
+                        : compilationRepository.findAll(pageable);
 
         List<Compilation> compilationList = compilationPage.getContent();
 
-        // 1. Собираем все события из всех компиляций
-        List<EventShortDto> allEvents = compilationList.stream()
+        if (compilationList.isEmpty()) return List.of();
+
+        // Собираем все eventIds
+        List<Long> eventIds = compilationList.stream()
                 .flatMap(c -> c.getEvents().stream())
-                .map(eventMapper::toEventShortDto)
+                .map(Event::getId)
+                .distinct()
                 .toList();
 
-        List<Long> eventIds = allEvents.stream()
-                .map(EventShortDto::getId)
-                .toList();
+        if (eventIds.isEmpty()) {
+            return compilationList.stream()
+                    .map(compilationMapper::toCompilationDto)
+                    .toList();
+        }
 
-        // 2. Получаем confirmedRequests одним запросом
+        // Счётчики подтверждённых запросов
         Map<Long, Long> confirmedCounts = requestRepository.countConfirmedByEventIds(eventIds);
 
-        // 3. Получаем views одним запросом к statsClient
-        List<String> uris = eventIds.stream()
-                .map(id -> "/events/" + id)
-                .toList();
+        // Счётчики просмотров
+        List<String> uris = eventIds.stream().map(id -> "/events/" + id).toList();
 
-        ViewStatsRequest viewStatsRequest = new ViewStatsRequest(
-                LocalDateTime.now().minusYears(100),
-                LocalDateTime.now(),
-                uris,
-                true
-        );
-
-        List<ViewStats> viewStatsList = statsClient.getStats(viewStatsRequest);
+        List<ViewStats> viewStatsList;
+        try {
+            viewStatsList = statsClient.getStats(new ViewStatsRequest(
+                    LocalDateTime.now().minusYears(1),
+                    LocalDateTime.now(),
+                    uris,
+                    true
+            ));
+        } catch (Exception e) {
+            viewStatsList = List.of();
+        }
 
         Map<Long, Long> viewsMap = viewStatsList.stream()
                 .collect(Collectors.toMap(
@@ -89,20 +92,16 @@ public class CompilationServiceImpl implements CompilationService {
                         ViewStats::getHits
                 ));
 
-        // 4. Создаем Map для мгновенного доступа к событиям по id
-        Map<Long, EventShortDto> eventMap = allEvents.stream()
-                .peek(e -> {
-                    e.setConfirmedRequests(confirmedCounts.getOrDefault(e.getId(), 0L));
-                    e.setViews(viewsMap.getOrDefault(e.getId(), 0L));
-                })
-                .collect(Collectors.toMap(EventShortDto::getId, e -> e));
-
-        // 5. Собираем компиляции с обновлёнными событиями
+        // Собираем DTO
         return compilationList.stream()
                 .map(compilation -> {
                     CompilationDto dto = compilationMapper.toCompilationDto(compilation);
                     List<EventShortDto> updatedEvents = compilation.getEvents().stream()
-                            .map(e -> eventMap.get(e.getId()))
+                            .map(eventMapper::toEventShortDto)
+                            .peek(e -> {
+                                e.setConfirmedRequests(confirmedCounts.getOrDefault(e.getId(), 0L));
+                                e.setViews(viewsMap.getOrDefault(e.getId(), 0L));
+                            })
                             .toList();
                     dto.setEvents(updatedEvents);
                     return dto;

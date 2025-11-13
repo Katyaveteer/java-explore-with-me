@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.statsdto.EndpointHit;
 import ru.practicum.statsdto.ViewStats;
+import ru.practicum.statsserver.exception.ValidationException;
 import ru.practicum.statsserver.model.EndpointHitEntity;
 import ru.practicum.statsserver.repository.StatsRepository;
 
@@ -35,10 +36,18 @@ public class StatsServiceImpl implements StatsService {
         LocalDateTime s = LocalDateTime.parse(start, formatter);
         LocalDateTime e = LocalDateTime.parse(end, formatter);
 
+        if (s.isAfter(e)) {
+            throw new ValidationException("Дата начала должна быть раньше даты окончания");
+        }
+
+        // Если uris пустой или null — не фильтруем по URI
+        List<String> filteredUris = (uris != null && !uris.isEmpty()) ? uris : null;
+
         if (unique) {
-            return repository.getUniqueStats(s, e, (uris == null || uris.isEmpty()) ? null : uris);
+            return repository.getUniqueStats(s, e, filteredUris);
         } else {
-            return repository.getAllStats(s, e, (uris == null || uris.isEmpty()) ? null : uris);
+            return repository.getAllStats(s, e, filteredUris);
         }
     }
+
 }

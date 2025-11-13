@@ -1,45 +1,134 @@
 package ru.practicum.statsclient;
 
-import org.springframework.http.HttpEntity;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
 import ru.practicum.statsdto.EndpointHit;
 import ru.practicum.statsdto.ViewStats;
+import ru.practicum.statsdto.ViewStatsRequest;
 
 import java.net.URI;
-import java.util.Arrays;
+import java.net.URLEncoder;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
-@Component
+
+@Slf4j
+@Service
 public class StatsClient {
-    private final RestTemplate rest;
-    private final String statsBaseUrl;
+    private static final DateTimeFormatter DTF = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    public StatsClient(RestTemplate rest, String statsBaseUrl) {
-        this.rest = rest;
-        this.statsBaseUrl = statsBaseUrl; // example: "http://localhost:9090"
+    private final String application;
+
+    private final String statsServiceUri;
+
+    private final ObjectMapper json;
+
+    private final HttpClient httpClient;
+
+    @Autowired
+    public StatsClient(@Value("ewm-main-service") String application,
+                       @Value("${stats-server.url}") String statsServiceUri,
+                       ObjectMapper json) {
+        this.application = application;
+        this.statsServiceUri = statsServiceUri;
+        this.json = json;
+        this.httpClient = HttpClient.newBuilder()
+                .connectTimeout(Duration.ofSeconds(2))
+                .build();
     }
 
-    public void postHit(EndpointHit hit) {
-        HttpEntity<EndpointHit> request = new HttpEntity<>(hit);
-        rest.postForLocation(statsBaseUrl + "/hit", request);
-    }
+    public void hit(String userIp, String requestUri) {
+        EndpointHit hit = EndpointHit.builder()
+                .app(application)
+                .ip(userIp)
+                .uri(requestUri)
+                .timestamp(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                .build();
 
-    public List<ViewStats> getStats(String start, String end, List<String> uris, boolean unique) {
-        StringBuilder url = new StringBuilder(statsBaseUrl + "/stats?start=" + encode(start) + "&end=" + encode(end) + "&unique=" + unique);
-        if (uris != null && !uris.isEmpty()) {
-            for (String uri : uris) {
-                url.append("&uris=").append(encode(uri));
-            }
+        log.info("StatsClient / hit: {}", hit.toString());
+
+        try {
+            HttpRequest.BodyPublisher bodyPublisher = HttpRequest
+                    .BodyPublishers
+                    .ofString(json.writeValueAsString(hit));
+
+            // формируем запрос
+            HttpRequest hitRequest = HttpRequest.newBuilder()
+                    .uri(URI.create(statsServiceUri + "/hit"))
+                    .POST(bodyPublisher)
+                    .header(HttpHeaders.CONTENT_TYPE, "application/json")
+                    .header(HttpHeaders.ACCEPT, "application/json")
+                    .build();
+
+            log.info("StatsClient / hitRequest: {}", hitRequest.toString());
+
+            // отправляем сформированный запрос
+            HttpResponse<Void> response = httpClient.send(hitRequest, HttpResponse.BodyHandlers.discarding());
+            log.debug("Ответ от статистического сервиса: {}", response);
+        } catch (Exception e) {
+            log.warn("Не удается записать  hit", e);
         }
-        ResponseEntity<ViewStats[]> resp = rest.getForEntity(URI.create(url.toString()), ViewStats[].class);
-        return Arrays.asList(Objects.requireNonNull(resp.getBody()));
     }
 
-    private String encode(String s) {
-        return java.net.URLEncoder.encode(s, java.nio.charset.StandardCharsets.UTF_8);
+    public List<ViewStats> getStats(ViewStatsRequest request) {
+        try {
+            String queryString = toQueryString(request);
+            log.info("StatsClient / queryString: {}", queryString);
+
+            // полученную строку вставляем в запрос
+            HttpRequest httpRequest = HttpRequest.newBuilder()
+                    .uri(URI.create(statsServiceUri + "/stats" + queryString))
+                    .header(HttpHeaders.ACCEPT, "application/json")
+                    .build();
+
+            log.info("StatsClient / httpRequest: {}", httpRequest.toString());
+
+            // отправляем сформированный запрос
+            HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+
+            if (HttpStatus.valueOf(response.statusCode()).is2xxSuccessful()) {
+                return json.readValue(response.body(), new TypeReference<>() {
+                });
+            }
+
+            log.debug("Ответ от статистического сервиса: {}", response);
+        } catch (Exception e) {
+            log.warn("Не удается получить статистику просмотра по запросу: " + request, e);
+        }
+        return Collections.emptyList();
+    }
+
+    // преобразуем dto в строку запроса
+    private String toQueryString(ViewStatsRequest request) {
+        String start = encode(DTF.format(request.getStart()));
+        String end = encode(DTF.format(request.getEnd()));
+
+        String queryString = String.format("?start=%s&end=%s",
+                start, end);
+
+        if (request.getUris() != null && !request.getUris().isEmpty()) {
+            queryString += "&uris=" + String.join(",", request.getUris());
+        }
+
+        queryString += String.format("&unique=%b", request.isUnique());
+
+        return queryString;
+    }
+
+    private String encode(String value) {
+        return URLEncoder.encode(value, StandardCharsets.UTF_8);
     }
 }
-

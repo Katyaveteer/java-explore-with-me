@@ -271,7 +271,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n    \"annotation\": \"invite famous people on TV show\",\r\n    \"category\": \"1\",\r\n    \"description\": \"famous people tell about their films, songs, plays\",\r\n    \"eventDate\": \"2023-12-03 00:57:14\",\r\n    \"location\": {\r\n        \"lat\": \"-19.6556\",\r\n        \"lon\": \"-74.2121\"\r\n    },\r\n    \"paid\": false,\r\n    \"participantLimit\": 0,\r\n    \"requestModeration\": true,\r\n    \"title\": \"Late night show\"\r\n}",
+          "raw": "{\r\n    \"annotation\": \"invite famous people on TV show\",\r\n    \"category\": \"1\",\r\n    \"description\": \"famous people tell about their films, songs, plays\",\r\n    \"eventDate\": \"2025-12-13 00:57:14\",\r\n    \"location\": {\r\n        \"lat\": \"-19.6556\",\r\n        \"lon\": \"-74.2121\"\r\n    },\r\n    \"paid\": false,\r\n    \"participantLimit\": 0,\r\n    \"requestModeration\": true,\r\n    \"title\": \"Late night show\"\r\n}",
           "options": {
             "raw": {
               "language": "json"

@@ -34,7 +34,7 @@ public class CommentServiceImpl implements CommentService {
         commentToSave.setCommentator(userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException("Пользователь не существует " + userId)));
         commentToSave.setEvent(eventRepository.findById(eventId).orElseThrow(() ->
-                new NotFoundException("Пользователь не существует " + eventId)));
+                new NotFoundException("Событие не существует " + eventId)));
 
         commentRepository.save(commentToSave);
 
@@ -61,7 +61,7 @@ public class CommentServiceImpl implements CommentService {
             throw new ValidationException("Пользователь с идентификатором не является комментатором" + userId);
         }
 
-        if (!newCommentDto.getCommentText().isEmpty() && newCommentDto.getCommentText() != null) {
+        if (newCommentDto.getCommentText() != null && !newCommentDto.getCommentText().isEmpty()) {
             commentToUpdate.setCommentText(newCommentDto.getCommentText());
             commentRepository.save(commentToUpdate);
         }

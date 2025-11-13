@@ -105,7 +105,7 @@ public class EventServiceImpl implements EventService {
 
         if (newEventDto.getEventDate().minusHours(2).isBefore(LocalDateTime.now())) {
             throw new ValidationException("дата и время на которые намечено событие не может быть раньше, " +
-                    "чем через два часа от текущего момента");
+                    "чем через час от текущего момента");
         }
 
         // формируем event для сохранения в БД

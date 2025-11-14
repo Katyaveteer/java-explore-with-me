@@ -27,7 +27,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -218,8 +217,6 @@ public class EventServiceImpl implements EventService {
                 pageRequest
         ).toList();
     }
-
-
 
 
     // редактирование данных события и его статуса

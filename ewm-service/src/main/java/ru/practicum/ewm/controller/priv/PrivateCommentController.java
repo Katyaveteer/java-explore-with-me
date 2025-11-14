@@ -10,7 +10,6 @@ import ru.practicum.ewm.dto.comment.NewCommentDto;
 import ru.practicum.ewm.service.comment.CommentService;
 
 
-
 @RestController
 @RequestMapping(path = "/users/{userId}/comments")
 @RequiredArgsConstructor
@@ -24,10 +23,10 @@ public class PrivateCommentController {
     public CommentDto addComment(@PathVariable Long userId,
                                  @RequestParam Long eventId,
                                  @Valid @RequestBody NewCommentDto newCommentDto) {
-        log.info("PrivateCommentController / addComment: " +
-                "добавление пользователем {} комментария {}", userId, eventId);
+        log.info("PrivateCommentController / addComment: добавление пользователем {} комментария к событию {}", userId, eventId);
         return commentService.addComment(userId, eventId, newCommentDto);
     }
+
 
     // удаление комментария
     @DeleteMapping("/{commentId}")

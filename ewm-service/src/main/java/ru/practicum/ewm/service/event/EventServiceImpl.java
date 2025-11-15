@@ -27,7 +27,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -103,9 +102,8 @@ public class EventServiceImpl implements EventService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь не существует " + userId));
 
-        if (newEventDto.getEventDate().minusHours(2).isBefore(LocalDateTime.now())) {
-            throw new ValidationException("дата и время на которые намечено событие не может быть раньше, " +
-                    "чем через два часа от текущего момента");
+        if (newEventDto.getEventDate().isBefore(LocalDateTime.now())) {
+            throw new ValidationException("Дата и время события не могут быть в прошлом");
         }
 
         // формируем event для сохранения в БД
@@ -219,8 +217,6 @@ public class EventServiceImpl implements EventService {
                 pageRequest
         ).toList();
     }
-
-
 
 
     // редактирование данных события и его статуса

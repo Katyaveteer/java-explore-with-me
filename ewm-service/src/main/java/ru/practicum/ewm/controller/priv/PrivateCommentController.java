@@ -33,8 +33,8 @@ public class PrivateCommentController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteComment(@PathVariable Long userId,
                               @PathVariable Long commentId) {
-        log.info("PrivateCommentController / deleteComment: " +
-                "удаление пользователем {} комментария {}", userId, commentId);
+        log.info("PrivateCommentController / deleteComment: удаление пользователем {} комментария {}",
+                userId, commentId);
         commentService.deleteComment(userId, commentId);
     }
 
